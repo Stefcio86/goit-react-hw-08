@@ -5,7 +5,7 @@ import SearchBox from './components/SearchBox';
 
 const App = () => {
   const [contacts, setContacts] = useState(() => {
-    // Sprawdź, czy istnieją zapisane kontakty w localStorage
+    
     const savedContacts = localStorage.getItem('contacts');
     return savedContacts ? JSON.parse(savedContacts) : [
       { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
@@ -18,7 +18,7 @@ const App = () => {
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    // Zapisz kontakty do localStorage za każdym razem, gdy się zmienią
+    
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
