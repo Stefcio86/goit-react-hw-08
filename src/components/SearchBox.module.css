@@ -1,0 +1,18 @@
+.searchBox {
+    margin-bottom: 20px; 
+    margin-top: 20px;
+  }
+  
+  .searchLabel {
+    margin-bottom: 8px; 
+    display: block; 
+    font-weight: bold; 
+  }
+  
+  .searchInput {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    max-width: 443px;
+  }
+  
