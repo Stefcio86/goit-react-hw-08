@@ -12,10 +12,12 @@ const ContactForm = ({ onAddContact }) => {
 
   const validationSchema = Yup.object({
     name: Yup.string()
+      .matches(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces') // Tylko litery i spacje
       .min(3, 'Must be at least 3 characters')
       .max(50, 'Must be 50 characters or less')
       .required('Required'),
     number: Yup.string()
+      .matches(/^\d+$/, 'Number can only contain digits') 
       .min(3, 'Must be at least 3 characters')
       .max(50, 'Must be 50 characters or less')
       .required('Required'),
