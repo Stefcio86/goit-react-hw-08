@@ -44,11 +44,11 @@ const ContactForm = () => {
     >
       <Form className={styles.form}>
         <label htmlFor="name">Name</label>
-        <Field id="name" name="name" type="text" />
+        <Field id="name" name="name" type="text" autoComplete="off"/>
         <ErrorMessage name="name" component="div" className={styles.error} />
 
         <label htmlFor="number">Number</label>
-        <Field id="number" name="number" type="text" />
+        <Field id="number" name="number" type="text" autoComplete="off" />
         <ErrorMessage name="number" component="div" className={styles.error} />
 
         <button type="submit">Add Contact</button>
