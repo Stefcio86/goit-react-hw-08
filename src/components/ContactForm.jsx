@@ -1,10 +1,13 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
+import { useDispatch } from 'react-redux';
+import { addContact } from '../slices/contactsSlice';
 import styles from './ContactForm.module.css';
 
-const ContactForm = ({ onAddContact }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch(); 
+
   const initialValues = {
     name: '',
     number: '',
@@ -12,7 +15,7 @@ const ContactForm = ({ onAddContact }) => {
 
   const validationSchema = Yup.object({
     name: Yup.string()
-      .matches(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces') // Tylko litery i spacje
+      .matches(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces') 
       .min(3, 'Must be at least 3 characters')
       .max(50, 'Must be 50 characters or less')
       .required('Required'),
@@ -29,7 +32,7 @@ const ContactForm = ({ onAddContact }) => {
       name: values.name,
       number: values.number,
     };
-    onAddContact(newContact);
+    dispatch(addContact(newContact));
     resetForm();
   };
 
@@ -54,8 +57,5 @@ const ContactForm = ({ onAddContact }) => {
   );
 };
 
-ContactForm.propTypes = {
-  onAddContact: PropTypes.func.isRequired,
-};
 
 export default ContactForm;

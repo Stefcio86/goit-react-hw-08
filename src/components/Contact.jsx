@@ -1,9 +1,17 @@
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { useDispatch } from 'react-redux';
+import { deleteContact } from '../slices/contactsSlice';
 import styles from './Contact.module.css';
 
-const Contact = ({ name, number, onDelete }) => {
+const Contact = ({ id, name, number }) => {
+  const dispatch = useDispatch();
+  
+  const handleDelete = () => {
+    dispatch(deleteContact(id));
+  };
+  
   return (
     <li className={styles.contactCard}>
       <div className={styles.contactDetails}>
@@ -17,7 +25,7 @@ const Contact = ({ name, number, onDelete }) => {
       <button
         type="button"
         className={styles.deleteButton}
-        onClick={onDelete}
+        onClick={handleDelete} 
       >
         Delete
       </button>
@@ -26,10 +34,9 @@ const Contact = ({ name, number, onDelete }) => {
 };
 
 Contact.propTypes = {
+  id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   number: PropTypes.string.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };
 
 export default Contact;
-
