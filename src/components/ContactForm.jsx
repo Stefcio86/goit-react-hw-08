@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { nanoid } from 'nanoid';
@@ -10,7 +11,7 @@ const ContactForm = () => {
 
   const initialValues = {
     name: '',
-    number: '',
+    phone: '',  
   };
 
   const validationSchema = Yup.object({
@@ -19,8 +20,8 @@ const ContactForm = () => {
       .min(3, 'Must be at least 3 characters')
       .max(50, 'Must be 50 characters or less')
       .required('Required'),
-    number: Yup.string()
-      .matches(/^\d+$/, 'Number can only contain digits') 
+    phone: Yup.string()  
+      .matches(/^\d+$/, 'Phone can only contain digits') 
       .min(3, 'Must be at least 3 characters')
       .max(50, 'Must be 50 characters or less')
       .required('Required'),
@@ -30,7 +31,7 @@ const ContactForm = () => {
     const newContact = {
       id: nanoid(),
       name: values.name,
-      number: values.number,
+      phone: values.phone,  
     };
     dispatch(addContact(newContact));
     resetForm();
@@ -47,9 +48,9 @@ const ContactForm = () => {
         <Field id="name" name="name" type="text" autoComplete="off"/>
         <ErrorMessage name="name" component="div" className={styles.error} />
 
-        <label htmlFor="number">Number</label>
-        <Field id="number" name="number" type="text" autoComplete="off" />
-        <ErrorMessage name="number" component="div" className={styles.error} />
+        <label htmlFor="phone">Phone</label>  
+        <Field id="phone" name="phone" type="text" autoComplete="off" />  
+        <ErrorMessage name="phone" component="div" className={styles.error} />
 
         <button type="submit">Add Contact</button>
       </Form>
@@ -57,5 +58,5 @@ const ContactForm = () => {
   );
 };
 
-
 export default ContactForm;
+

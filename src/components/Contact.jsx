@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { deleteContact } from '../slices/contactsSlice';
 import styles from './Contact.module.css';
 
-const Contact = ({ id, name, number }) => {
+const Contact = ({ id, name, phone }) => {  
   const dispatch = useDispatch();
   
   const handleDelete = () => {
@@ -19,7 +19,7 @@ const Contact = ({ id, name, number }) => {
           <FontAwesomeIcon icon={faUser} className={styles.icon} /> {name}
         </span>
         <span className={styles.contactNumber}>
-          <FontAwesomeIcon icon={faPhone} className={styles.icon} /> {number}
+          <FontAwesomeIcon icon={faPhone} className={styles.icon} /> {phone}  {/* Zmień `number` na `phone` */}
         </span>
       </div>
       <button
@@ -36,7 +36,7 @@ const Contact = ({ id, name, number }) => {
 Contact.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  number: PropTypes.string.isRequired,
+  phone: PropTypes.string.isRequired, 
 };
 
 export default Contact;

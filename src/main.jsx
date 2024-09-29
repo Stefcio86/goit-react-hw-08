@@ -1,8 +1,7 @@
-// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
-import store from './slices/store';
+import store from './slices/store'; 
 import App from './App.jsx';
 import './index.css';
 
