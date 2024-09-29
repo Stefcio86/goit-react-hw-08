@@ -3,6 +3,9 @@ import Contact from './Contact';
 import styles from './ContactList.module.css';
 
 const ContactList = ({ contacts }) => {
+  if (contacts.length === 0) {
+    return <p>No contacts available.</p>;
+  }
   return (
     <ul className={styles.contactList}>
       {contacts.map(contact => (
