@@ -1,34 +1,48 @@
-import { useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import ContactList from './components/ContactList';
-import ContactForm from './components/ContactForm';
-import SearchBox from './components/SearchBox';
-import { fetchContacts } from './slices/contactsSlice';
-import { setFilter } from './slices/filtersSlice';
+import { fetchCurrentUser } from './slices/authSlice';  
+import PrivateRoute from './components/PrivateRoute';   
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import Header from './components/Header';
+import Loader from './components/Loader';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const ContactsPage = lazy(() => import('./pages/ContactsPage'));
 
 const App = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts.items);
-  const filter = useSelector(state => state.filters.name);
+  const isFetchingCurrentUser = useSelector(state => state.auth.isFetchingCurrentUser);
 
-  
   useEffect(() => {
-    dispatch(fetchContacts());
+    dispatch(fetchCurrentUser());
   }, [dispatch]);
 
-  
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
-  );
+  if (isFetchingCurrentUser) {
+    return <Loader />;
+  }
 
   return (
-    <div>
-      <h1>Phonebook</h1>
-      <ContactForm />
-      <SearchBox value={filter} onChange={event => dispatch(setFilter(event.target.value))} />
-      <ContactList contacts={filteredContacts} />
-    </div>
-  );
+    <Suspense fallback={<Loader />}>
+      <Header />
+      <ToastContainer />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/contacts"
+          element={
+            <PrivateRoute component={ContactsPage} />
+          }
+        />
+      </Routes>
+    </Suspense>
+);
 };
 
 export default App;
+

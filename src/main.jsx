@@ -1,13 +1,25 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { Provider } from 'react-redux';
-import store from './slices/store'; 
-import App from './App.jsx';
-import './index.css';
+import { StrictMode } from "react";
+import App from "./App.jsx";
+import "./index.css";
+import { Provider } from "react-redux";
+import ReactDOM from "react-dom/client";
+import { persistor, store } from "./store.js"; // upewnij się, że masz export persistor
+import { BrowserRouter } from "react-router-dom";
+import { PersistGate } from "redux-persist/integration/react";
+import { HelmetProvider } from "react-helmet-async";
+import { Toaster } from "react-hot-toast";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <Provider store={store}>
-    <App />
-  </Provider>
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <BrowserRouter>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <HelmetProvider>
+            <App />
+            <Toaster />
+          </HelmetProvider>
+        </PersistGate>
+      </Provider>
+    </BrowserRouter>
+  </StrictMode>
 );
