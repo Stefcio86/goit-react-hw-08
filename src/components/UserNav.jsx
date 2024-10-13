@@ -1,13 +1,13 @@
-// components/UserNav.jsx
+
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../redux/auth/operations";
 import { selectUser } from "../redux/auth/selectors";
 
 export default function UserNav() {
   const dispatch = useDispatch();
-  const userName = useSelector(selectUser); // Wybieramy nazwę użytkownika z Redux
+  const userName = useSelector(selectUser); 
   const handleLogout = () => {
-    dispatch(logOut()); // Wywołanie operacji wylogowania
+    dispatch(logOut()); 
   };
 
   return (
