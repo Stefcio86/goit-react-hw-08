@@ -1,7 +1,12 @@
-import { useDispatch } from 'react-redux';
+// eslint-disable-next-line no-unused-vars
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { login } from '../slices/authSlice';
+import DocumentTitle from '../components/DokumentTitle';
+import { logIn } from '../redux/auth/operations'
+import Loader from '../components/Loader';
+import { resetError } from '../redux/auth/authslice';
 import styles from './LoginPage.module.css';
 
 const LoginSchema = Yup.object().shape({
@@ -11,33 +16,45 @@ const LoginSchema = Yup.object().shape({
 
 const LoginPage = () => {
   const dispatch = useDispatch();
+  const isLoading = useSelector((state) => state.auth.loading);
+  const error = useSelector((state) => state.auth.error);
 
-  const handleSubmit = (values, { resetForm }) => {
-    dispatch(login(values));
-    resetForm();
+  const handleSubmit = async (values, { resetForm }) => {
+    try {
+      await dispatch(logIn(values)).unwrap();
+      resetForm();
+    } catch {
+      // Error Login profile
+    }
   };
 
+  useEffect(() => {
+    return () => {
+      dispatch(resetError()); 
+    };
+  }, [dispatch]);
+
   return (
-    <div className={styles.container}>
-      <h1>Logowanie</h1>
-      <Formik
-        initialValues={{ email: '', password: '' }}
-        validationSchema={LoginSchema}
-        onSubmit={handleSubmit}
-      >
-        <Form className={styles.form}>
-          <label htmlFor="email">Email</label>
-          <Field type="email" name="email" />
-          <ErrorMessage name="email" component="div" className={styles.error} />
-
-          <label htmlFor="password">Hasło</label>
-          <Field type="password" name="password" />
-          <ErrorMessage name="password" component="div" className={styles.error} />
-
-          <button type="submit" className={styles.submitButton}>Zaloguj się</button>
-        </Form>
-      </Formik>
-    </div>
+    <>
+      <DocumentTitle>Login</DocumentTitle>
+      <div className={styles.container}>
+        <h1>Login</h1>
+        <Formik initialValues={{ email: '', password: '' }} validationSchema={LoginSchema} onSubmit={handleSubmit}>
+          <Form className={styles.form}>
+            <label htmlFor="email">Email</label>
+            <Field type="email" name="email" />
+            <ErrorMessage name="email" component="div" className={styles.error} />
+            <label htmlFor="password">Password</label>
+            <Field type="password" name="password" />
+            <ErrorMessage name="password" component="div" className={styles.error} />
+            <button type="submit" className={styles.submitButton} disabled={isLoading}>
+              {isLoading ? <Loader /> : 'Zaloguj się'}
+            </button>
+            {error && <div className={styles.error}>Loading error: {error}</div>}
+          </Form>
+        </Formik>
+      </div>
+    </>
   );
 };
 

@@ -1,28 +1,22 @@
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
-import { setFilter } from '../slices/filtersSlice';
-import styles from './SearchBox.module.css';
+import { setFilter } from '../redux/filters/filterSlice';
 import { useEffect, useState } from 'react';
+import styles from './SearchBox.module.css';
 
-const SearchBox = ({ value }) => {
+const SearchBox = ({ value = '' }) => { 
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState(value);
-  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       dispatch(setFilter(searchTerm));
-      setIsSearching(false);
     }, 300);
-
-    setIsSearching(true);
-
     return () => {
       clearTimeout(handler);
     };
   }, [searchTerm, dispatch]);
 
-  // Synchronizacja lokalnego stanu z propsami
   useEffect(() => {
     setSearchTerm(value);
   }, [value]);
@@ -47,17 +41,19 @@ const SearchBox = ({ value }) => {
           id="search"
           onChange={handleChange}
           value={searchTerm}
-          className={`${styles.searchInput} ${isSearching ? styles.searching : ''}`}
+          className={styles.searchInput}
           placeholder="Search contacts..."
         />
-        <button type="button" onClick={handleClear} className={styles.clearButton}>Clear</button>
+        <button type="button" onClick={handleClear} className={styles.clearButton}>
+          Clear
+        </button>
       </div>
     </div>
   );
 };
 
 SearchBox.propTypes = {
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
 };
 
 export default SearchBox;

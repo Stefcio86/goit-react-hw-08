@@ -1,0 +1,33 @@
+
+    .nav {
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #4c91af;
+        color: white;
+        border-bottom: 2px solid #333;
+      }
+      
+      .navLink {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        margin-right: 15px; 
+        transition: text-decoration 0.3s ease;
+       
+      }
+      
+      .navLink:hover {
+        color: #0056b3;
+      }
+      
+      .userSection {
+        margin-left: auto; 
+        display: flex;
+        align-items: center;
+        gap: 15px; 
+      }
+  
+  .navlink:active {
+    color: #003d80;
+  }

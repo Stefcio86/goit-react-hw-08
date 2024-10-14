@@ -3,12 +3,12 @@ import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { selectIsLoggedIn } from "../redux/auth/selectors";
 
-export default function PrivateRoute({ children, redirectPath = "/login" }) {
+export default function RestrictedRoute({ children, redirectPath = "/contacts" }) {
   const isLoggedIn = useSelector(selectIsLoggedIn);
-  return isLoggedIn ? children : <Navigate to={redirectPath} replace />;
+  return isLoggedIn ? <Navigate to={redirectPath} /> : children;
 }
 
-PrivateRoute.propTypes = {
+RestrictedRoute.propTypes = {
   children: PropTypes.node.isRequired,
   redirectPath: PropTypes.string,
 };

@@ -1,48 +1,75 @@
-import { Routes, Route } from 'react-router-dom';
-import { lazy, Suspense, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCurrentUser } from './slices/authSlice';  
-import PrivateRoute from './components/PrivateRoute';   
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
-import Header from './components/Header';
-import Loader from './components/Loader';
+import { useDispatch, useSelector } from "react-redux";
+import { lazy, useEffect } from "react";
+import Layout from "./components/Layout";
+import { Route, Routes } from "react-router-dom";
+import RestrictedRoute from "./components/RestrictedRoute";
+import PrivateRoute from "./components/PrivateRoute";
+import { selectError, selectLoading } from "./redux/contacts/selectors";
+import { setFilter } from "./redux/filters/filterSlice";
+import { refreshUser } from "./redux/auth/operations";
+import { fetchContacts } from "./redux/contacts/operations";
+import { selectIsRefreshUser, selectIsLoggedIn } from "./redux/auth/selectors";
 
-const HomePage = lazy(() => import('./pages/HomePage'));
-const RegisterPage = lazy(() => import('./pages/RegisterPage'));
-const LoginPage = lazy(() => import('./pages/LoginPage'));
-const ContactsPage = lazy(() => import('./pages/ContactsPage'));
+const HomePage = lazy(() => import("./pages/HomePage"));
+const ContactsPage = lazy(() => import("./pages/ContactsPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
 
-const App = () => {
+function App() {
   const dispatch = useDispatch();
-  const isFetchingCurrentUser = useSelector(state => state.auth.isFetchingCurrentUser);
+  const loading = useSelector(selectLoading);
+  const error = useSelector(selectError);
+  const isRefreshUser = useSelector(selectIsRefreshUser);
+  const isLoggedIn = useSelector(selectIsLoggedIn);
 
   useEffect(() => {
-    dispatch(fetchCurrentUser());
+    dispatch(setFilter(""));
+    dispatch(refreshUser());
   }, [dispatch]);
 
-  if (isFetchingCurrentUser) {
-    return <Loader />;
+  useEffect(() => {
+    if (!isRefreshUser && isLoggedIn) {
+      dispatch(fetchContacts());
+    }
+  }, [dispatch, isRefreshUser, isLoggedIn]);
+
+  if (isRefreshUser) {
+    return <p>Refreshing...</p>;
   }
 
   return (
-    <Suspense fallback={<Loader />}>
-      <Header />
-      <ToastContainer />
+    <Layout>
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error}</p>}
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
         <Route
           path="/contacts"
           element={
-            <PrivateRoute component={ContactsPage} />
+            <PrivateRoute redirectPath="/login">
+              <ContactsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <RestrictedRoute redirectPath="/contacts">
+              <RegisterPage />
+            </RestrictedRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <RestrictedRoute redirectPath="/contacts">
+              <LoginPage />
+            </RestrictedRoute>
           }
         />
       </Routes>
-    </Suspense>
-);
-};
+    </Layout>
+  );
+}
 
 export default App;
-

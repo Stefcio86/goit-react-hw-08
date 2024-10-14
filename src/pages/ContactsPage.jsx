@@ -1,44 +1,58 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import Fuse from 'fuse.js'; 
 import ContactList from '../components/ContactList';
 import ContactForm from '../components/ContactForm';
 import SearchBox from '../components/SearchBox';
-import { fetchContacts } from '../slices/contactsSlice';
-import { logout } from '../slices/authSlice';  
+import Loader from '../components/Loader';
+import DocumentTitle from '../components/DokumentTitle';
+import { fetchContacts } from '../redux/contacts/operations';
+import { selectContacts, selectLoading, selectError } from '../redux/contacts/selectors';
+import { selectFilter } from '../redux/filters/selectors';
 import styles from './ContactsPage.module.css';
 
 const ContactsPage = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts.items);
-  const filter = useSelector(state => state.filters.name);
-  const loading = useSelector(state => state.contacts.loading);
-  const error = useSelector(state => state.contacts.error);
+  const contacts = useSelector(selectContacts);
+  const filter = useSelector(selectFilter);
+  const isLoading = useSelector(selectLoading);
+  const error = useSelector(selectError);
 
-  
   useEffect(() => {
-    dispatch(fetchContacts());
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      dispatch(fetchContacts());
+    }
   }, [dispatch]);
 
   
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
-  );
+  const fuse = new Fuse(contacts, {
+    keys: ['name', 'number'],
+    threshold: 0.3, 
+  });
 
   
-  const handleLogout = () => {
-    dispatch(logout());
-  };
+  const filteredContacts = filter
+    ? fuse.search(filter).map(result => result.item)
+    : contacts;
 
   return (
-    <div className={styles.container}>
-      <h1>Kontakty</h1>
-      <button onClick={handleLogout} className={styles.logoutButton}>Wyloguj się</button>
-      <ContactForm />
-      <SearchBox />
-      {loading && <p>Ładowanie kontaktów...</p>}
-      {error && <p>Błąd podczas pobierania kontaktów: {error}</p>}
-      <ContactList contacts={filteredContacts} />
-    </div>
+    <>
+      <DocumentTitle>Contacts</DocumentTitle>
+      <div className={styles.container}>
+        <h1>Contacts</h1>
+        <ContactForm />
+        <SearchBox value={filter} />
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <ContactList contacts={filteredContacts} isLoading={isLoading} error={error} />
+        )}
+        {error && <p className={styles.error}>Error downloading contacts: {error}</p>}
+      </div>
+    </>
   );
 };
 

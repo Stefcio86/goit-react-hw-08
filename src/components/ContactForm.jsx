@@ -1,74 +1,84 @@
-import PropTypes from 'prop-types';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { nanoid } from 'nanoid';
-import { useDispatch } from 'react-redux';
-import { addContact } from '../slices/contactsSlice';
-import styles from './ContactForm.module.css';
-import { useState } from 'react'; // Import useState
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { useId } from "react";
+import styles from "./ContactForm.module.css";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { selectContacts } from "../redux/contacts/selectors";
+import { addContact } from "../redux/contacts/operations";
+
+const userSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(3, "Name is too short")
+    .max(50, "Name is too long")
+    .required("Required"),
+  number: Yup.string()
+    .matches(/^\d{9}$/, "Number must be exactly 9 digits")
+    .required("Required"),
+});
+
+const formatNumber = (number) => {
+  return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6)}`;
+};
 
 const ContactForm = () => {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false); // Stan ładowania
-  const [successMessage, setSuccessMessage] = useState(''); // Stan wiadomości o sukcesie
+  const nameFieldId = useId();
+  const numberFieldId = useId();
+  const contacts = useSelector(selectContacts);
 
-  const initialValues = {
-    name: '',
-    phone: '',
-  };
+  const handleSubmit = (values, actions) => {
+    const formattedNumber = formatNumber(values.number);
+    const contactExists = (contacts || []).some(
+      (contact) =>
+        contact.name === values.name ||
+        contact.number === formattedNumber ||
+        contact.number === values.number
+    );
 
-  const validationSchema = Yup.object({
-    name: Yup.string()
-      .matches(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces')
-      .min(3, 'Must be at least 3 characters')
-      .max(50, 'Must be 50 characters or less')
-      .required('Required'),
-    phone: Yup.string()
-      .matches(/^\d+$/, 'Phone can only contain digits')
-      .min(3, 'Must be at least 3 characters')
-      .max(50, 'Must be 50 characters or less')
-      .required('Required'),
-  });
+    if (contactExists) {
+      alert("This contact already exists!");
+      return;
+    }
 
-  const handleSubmit = (values, { resetForm }) => {
-    setIsLoading(true); // Ustaw stan ładowania
-    const newContact = {
-      id: nanoid(),
-      name: values.name,
-      phone: values.phone,
-    };
-
-    dispatch(addContact(newContact)).then(() => {
-      setIsLoading(false); // Wyłącz stan ładowania
-      setSuccessMessage('Contact added successfully!'); // Ustaw wiadomość o sukcesie
-      resetForm();
-      setTimeout(() => setSuccessMessage(''), 3000); // Ukryj wiadomość po 3 sekundach
-    }).catch(() => {
-      setIsLoading(false); // Wyłącz stan ładowania w przypadku błędu
-    });
+    dispatch(addContact({ name: values.name, number: formattedNumber }));
+    actions.resetForm();
   };
 
   return (
     <Formik
-      initialValues={initialValues}
-      validationSchema={validationSchema}
+      initialValues={{ name: "", number: "" }}
       onSubmit={handleSubmit}
+      validationSchema={userSchema}
     >
-      <Form className={styles.form}>
-        <label htmlFor="name">Name</label>
-        <Field id="name" name="name" type="text" autoComplete="off" />
-        <ErrorMessage name="name" component="div" className={styles.error} />
-
-        <label htmlFor="phone">Phone</label>
-        <Field id="phone" name="phone" type="tel" autoComplete="off" />
-        <ErrorMessage name="phone" component="div" className={styles.error} />
-
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Adding...' : 'Add Contact'}
-        </button>
-
-        {successMessage && <p className={styles.success}>{successMessage}</p>} {/* Komunikat o sukcesie */}
-      </Form>
+      {() => (
+        <Form className={styles.form}>
+          <div className={styles.inputGroup}>
+            <label htmlFor={nameFieldId} className={styles.label}>Name</label>
+            <Field type="text" name="name" id={nameFieldId} className={styles.input} />
+            <ErrorMessage
+              name="name"
+              component="div"
+              className={styles.error}
+            />
+          </div>
+          <div className={styles.inputGroup}>
+            <label htmlFor={numberFieldId} className={styles.label}>Number</label>
+            <Field
+              type="text"
+              name="number"
+              id={numberFieldId}
+              maxLength={10}
+              className={styles.input}
+            />
+            <ErrorMessage
+              name="number"
+              component="div"
+              className={styles.error}
+            />
+          </div>
+          <button type="submit" className={styles.submitButton}>Add contact</button>
+        </Form>
+      )}
     </Formik>
   );
 };

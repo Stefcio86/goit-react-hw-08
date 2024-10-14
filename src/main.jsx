@@ -1,9 +1,9 @@
 import { StrictMode } from "react";
 import App from "./App.jsx";
-import "./index.css";
+// import "./index.css";
 import { Provider } from "react-redux";
 import ReactDOM from "react-dom/client";
-import { persistor, store } from "./store.js"; // upewnij się, że masz export persistor
+import { persistor, store } from "./store.js"; 
 import { BrowserRouter } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import { HelmetProvider } from "react-helmet-async";
