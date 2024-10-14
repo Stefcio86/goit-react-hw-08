@@ -6,5 +6,5 @@ export default defineConfig({
   build: {
     sourcemap: false, 
   },
-  base: '/goit-react-hw-08/',
+  base: './',
 });
