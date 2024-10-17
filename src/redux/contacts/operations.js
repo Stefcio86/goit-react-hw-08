@@ -22,7 +22,7 @@ export const addContact = createAsyncThunk(
     try {
       const newContact = {
         name,
-        number: JSON.stringify(number),
+        number,
       };
       const response = await axios.post(`/contacts`, newContact);
       toast.success("Contact added!");
